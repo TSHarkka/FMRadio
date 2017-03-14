@@ -2,6 +2,7 @@ package com.example.kayttaja.fmradio;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.view.View;
 import android.widget.SeekBar;
@@ -16,6 +17,10 @@ public class MainActivity extends AppCompatActivity {
     private SeekBar seekBar;
     private TextView seekbarTxtView;
     private TextView radioBTxtView;
+    private RadioGroup radioGroup;
+    int kanava1 = 910;
+    int kanava2 = 937;
+    boolean kanava1Valittu = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,17 +29,33 @@ public class MainActivity extends AppCompatActivity {
         seekBar = (SeekBar) findViewById(R.id.seekBar1);
         seekbarTxtView = (TextView) findViewById(R.id.seekbarTxt);
         radioBTxtView = (TextView) findViewById(R.id.radioBTxtView);
+        RadioGroup radioGroup = (RadioGroup) findViewById(R.id.kanavat);
 
-        final double minimiArvo = 87.0;
+        final int minimiArvo = 870;
         seekBar.setProgress(0);
-        seekBar.setMax(108);
+        seekBar.setMax(1080-870);
+
+        /*
+        radioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                // checkedId is the RadioButton selected
+                if (checkedId == 1) {
+
+                }
+            }
+        });
+        */
+
 
 
         // Initialize the textview with '0'.
         seekbarTxtView.setText("Covered: " + (seekBar.getProgress() + minimiArvo) + "/" + (seekBar.getMax() + minimiArvo) );
 
+
         seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-            double progress = 0;
+            int progress = 0;
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progresValue, boolean fromUser) {
@@ -46,6 +67,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 progress += minimiArvo;
+                /*
+                if (kanava1Valittu) {
+                    progress = kanava1;
+                    System.out.println(progress);
+                } else {
+                    progress = kanava2;
+                    System.out.println(progress);
+                }
+                */
                 seekbarTxtView.setText("Covered: " + progress + "/" + (seekBar.getMax() + minimiArvo) );    // tulsotetaan aloutusarvo +20
                 Toast.makeText(getApplicationContext(), "Started tracking seekbar", Toast.LENGTH_SHORT).show();
             }
@@ -54,6 +84,15 @@ public class MainActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 seekbarTxtView.setText("Covered: " + progress + "/" + (seekBar.getMax() + minimiArvo) );
                 Toast.makeText(getApplicationContext(), "Stopped tracking seekbar", Toast.LENGTH_SHORT).show();
+
+                if (kanava1Valittu) {
+                    kanava1 = progress;
+                    System.out.println(progress);
+                } else {
+                    kanava2 = progress;
+                    System.out.println(progress);
+                }
+
             }
             });
     }
@@ -62,11 +101,17 @@ public class MainActivity extends AppCompatActivity {
     {
         radioBTxtView.setText("Radio 1");
         System.out.println("Radio 1 painettu");
+        kanava1Valittu = true;
+        seekBar.setProgress(kanava1-870);
+        System.out.println(seekBar.getProgress());
     }
 
     public void radioB2(View v)
     {
         radioBTxtView.setText("Radio 2");
         System.out.println("Radio 2 painettu");
+        kanava1Valittu = false;
+        seekBar.setProgress(kanava2-870);
+        System.out.println(seekBar.getProgress());
     }
 }
