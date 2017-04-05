@@ -2,6 +2,7 @@ package com.example.kayttaja.fmradio;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.ImageButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.view.View;
@@ -18,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView seekbarTxtView;
     private TextView radioBTxtView;
     private RadioGroup radioGroup;
+    private ImageButton iBVolUpBig;
     int kanava1 = 910;
     int kanava2 = 937;
     boolean kanava1Valittu = false;
@@ -29,7 +31,8 @@ public class MainActivity extends AppCompatActivity {
         seekBar = (SeekBar) findViewById(R.id.seekBar1);
         seekbarTxtView = (TextView) findViewById(R.id.seekbarTxt);
         radioBTxtView = (TextView) findViewById(R.id.radioBTxtView);
-        RadioGroup radioGroup = (RadioGroup) findViewById(R.id.kanavat);
+        radioGroup = (RadioGroup) findViewById(R.id.kanavat);
+        iBVolUpBig = (ImageButton) findViewById(R.id.isoNuoliOikealle);
 
         final int minimiArvo = 870;
         seekBar.setProgress(0);
@@ -76,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                     System.out.println(progress);
                 }
                 */
-                seekbarTxtView.setText("Covered: " + progress + "/" + (seekBar.getMax() + minimiArvo) );    // tulsotetaan aloutusarvo +20
+                seekbarTxtView.setText("Covered: " + progress + "/" + (seekBar.getMax() + minimiArvo) );    // tulostetaan aloutusarvo +20
                 Toast.makeText(getApplicationContext(), "Started tracking seekbar", Toast.LENGTH_SHORT).show();
             }
 
@@ -114,4 +117,25 @@ public class MainActivity extends AppCompatActivity {
         seekBar.setProgress(kanava2-870);
         System.out.println(seekBar.getProgress());
     }
+
+    public void kasvataIsosti(View v)
+    {
+        // tsekataan että taajuus 87.0-108.0 MHz
+        if (seekBar.getProgress() > 1080-870 || seekBar.getProgress() < 0)
+        {
+            Toast.makeText(getApplicationContext(), "Taajuuden oltava 87.7 ja 108.0 välissä", Toast.LENGTH_SHORT).show();
+        } else {
+            int progress = seekBar.getProgress() + 10;
+            seekBar.setProgress(progress);
+            if (kanava1Valittu) {
+                kanava1 = progress + 870;
+                System.out.println(progress);
+            } else {
+                kanava2 = progress + 870;
+                System.out.println(progress);
+            }
+        }
+
+    }
+
 }
