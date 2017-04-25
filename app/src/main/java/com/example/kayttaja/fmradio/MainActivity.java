@@ -15,14 +15,16 @@ import android.media.ToneGenerator;
 
 public class MainActivity extends AppCompatActivity {
 
-    private SeekBar seekBar;
-    private TextView seekbarTxtView;
-    private TextView radioBTxtView;
-    private RadioGroup radioGroup;
-    private ImageButton iBVolUpBig;
-    int kanava1 = 910;
-    int kanava2 = 937;
-    boolean kanava1Valittu = false;
+    public SeekBar seekBar;
+    public TextView seekbarTxtView;
+    public TextView radioBTxtView;
+    public RadioGroup radioGroup;
+    public ImageButton iBVolUpBig;
+    public int kanava1 = 910-870;
+    public int kanava2 = 937-870;
+    public int kanava3 = 937-870;
+    public boolean kanava1Valittu = false;
+    public String kanava="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Initialize the textview with '0'.
-        seekbarTxtView.setText("Covered: " + (seekBar.getProgress() + minimiArvo) + "/" + (seekBar.getMax() + minimiArvo) );
+        seekbarTxtView.setText((double)(seekBar.getProgress() + minimiArvo)/10 + " MHz" );
 
 
         seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
@@ -63,13 +65,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progresValue, boolean fromUser) {
                 progress = progresValue + minimiArvo ; // lisataan arvoon aina minimi
-                seekbarTxtView.setText("Covered: " + progress + "/" + (seekBar.getMax() + minimiArvo) );    // muutetaan teksti heti kun arvo muttuu
-                Toast.makeText(getApplicationContext(), "Changing seekbar's progress", Toast.LENGTH_SHORT).show();
+                seekbarTxtView.setText((double)progress/10 + " MHz" );    // muutetaan teksti heti kun arvo muttuu
+                //Toast.makeText(getApplicationContext(), "Changing seekbar's progress", Toast.LENGTH_SHORT).show();
+                System.out.println("SEEKBAR AKTION 1");
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                progress += minimiArvo;
+                progress += minimiArvo; // miniarvo aina koskettaessa lsiättävä lukuun.
                 /*
                 if (kanava1Valittu) {
                     progress = kanava1;
@@ -79,22 +82,28 @@ public class MainActivity extends AppCompatActivity {
                     System.out.println(progress);
                 }
                 */
-                seekbarTxtView.setText("Covered: " + progress + "/" + (seekBar.getMax() + minimiArvo) );    // tulostetaan aloutusarvo +20
-                Toast.makeText(getApplicationContext(), "Started tracking seekbar", Toast.LENGTH_SHORT).show();
+                seekbarTxtView.setText((double)progress/10 + " MHz" );    // tulostetaan aloutusarvo +20
+                //Toast.makeText(getApplicationContext(), "Started tracking seekbar", Toast.LENGTH_SHORT).show();
+                System.out.println("SEEKBAR AKTION 2");
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                seekbarTxtView.setText("Covered: " + progress + "/" + (seekBar.getMax() + minimiArvo) );
-                Toast.makeText(getApplicationContext(), "Stopped tracking seekbar", Toast.LENGTH_SHORT).show();
+                seekbarTxtView.setText((double)progress/10 + " MHz" );
+                //Toast.makeText(getApplicationContext(), "Stopped tracking seekbar", Toast.LENGTH_SHORT).show();
 
                 if (kanava1Valittu) {
-                    kanava1 = progress;
-                    System.out.println(progress);
-                } else {
-                    kanava2 = progress;
+                    if (kanava == "CH1") {
+                        kanava1 = progress-870;
+                    } else if (kanava == "CH2") {
+                        kanava2 = progress-870;
+                    } else {
+                        kanava3 = progress-870;
+                    }
+
                     System.out.println(progress);
                 }
+                System.out.println("SEEKBAR AKTION 3");
 
             }
             });
@@ -103,36 +112,155 @@ public class MainActivity extends AppCompatActivity {
     public void radioB1(View v)
     {
         radioBTxtView.setText("Radio 1");
-        System.out.println("Radio 1 painettu");
+        System.out.println("                           !!!!!!!!!!!!!   Radio 1 painettu  "   + kanava1);
         kanava1Valittu = true;
-        seekBar.setProgress(kanava1-870);
+        kanava = "CH1";
+        System.out.println("                           !!!!!!!!!!!!!   Radio 1 painettu  "   + kanava1);
+        seekBar.setProgress(kanava1); // huomioidaan minimiarvo
         System.out.println(seekBar.getProgress());
+        System.out.println("                           !!!!!!!!!!!!!   Radio 1 tallennettu  "   + kanava1);
+
     }
 
     public void radioB2(View v)
     {
         radioBTxtView.setText("Radio 2");
-        System.out.println("Radio 2 painettu");
-        kanava1Valittu = false;
-        seekBar.setProgress(kanava2-870);
+        System.out.println("                           !!!!!!!!!!!!!   Radio 2 painettu  "   + kanava2);
+        kanava1Valittu = true;
+        kanava = "CH2";
+        seekBar.setProgress(kanava2);
         System.out.println(seekBar.getProgress());
+    }
+
+    public void radioB3(View v)
+    {
+        radioBTxtView.setText("Radio 3");
+        System.out.println("                           !!!!!!!!!!!!!   Radio 3 painettu  "   + kanava3);
+        kanava1Valittu = true;
+        kanava = "CH3";
+        seekBar.setProgress(kanava3);
+        System.out.println(seekBar.getProgress());
+    }
+
+    public void radioOff(View v)
+    {
+        radioBTxtView.setText("Radio 3");
+        System.out.println("Radio off painettu");
+        kanava1Valittu = false;
+        kanava="";
     }
 
     public void kasvataIsosti(View v)
     {
         // tsekataan että taajuus 87.0-108.0 MHz
-        if (seekBar.getProgress() > 1080-870 || seekBar.getProgress() < 0)
+        if (seekBar.getProgress() >= 1080-870)
         {
+            seekBar.setProgress(1080-870);
             Toast.makeText(getApplicationContext(), "Taajuuden oltava 87.7 ja 108.0 välissä", Toast.LENGTH_SHORT).show();
         } else {
+            System.out.println("!!!!!!!!!!!!!!         SEEKBAR PROGRESS   !!!!!!                  " + seekBar.getProgress() );
             int progress = seekBar.getProgress() + 10;
             seekBar.setProgress(progress);
             if (kanava1Valittu) {
-                kanava1 = progress + 870;
-                System.out.println(progress);
-            } else {
-                kanava2 = progress + 870;
-                System.out.println(progress);
+                if (kanava == "CH1") {
+                    this.kanava1 = progress;
+                    System.out.println("!!!!!!!!!!!!!!         KANAVA 1 PROGRESS   !!!!!!                  " + kanava1 );
+
+                    System.out.println("ch1 " + kanava1);
+                } else if (kanava == "CH2") {
+                    this.kanava2 = progress;
+                    System.out.println("ch2" + kanava2);
+                } else {
+                    this.kanava3 = progress;
+                    System.out.println("ch3" + kanava3);
+                }
+            }
+        }
+
+    }
+
+    public void pienennaIsosti(View v)
+    {
+        // tsekataan että taajuus 87.0-108.0 MHz
+        if (seekBar.getProgress() <= 0)
+        {
+            seekBar.setProgress(0);
+            Toast.makeText(getApplicationContext(), "Taajuuden oltava 87.7 ja 108.0 välissä", Toast.LENGTH_SHORT).show();
+        } else {
+            System.out.println("!!!!!!!!!!!!!!         SEEKBAR PROGRESS   !!!!!!                  " + seekBar.getProgress() );
+            int progress = seekBar.getProgress() - 10;
+            seekBar.setProgress(progress);
+            if (kanava1Valittu) {
+                if (kanava == "CH1") {
+                    this.kanava1 = progress;
+                    System.out.println("!!!!!!!!!!!!!!         KANAVA 1 PROGRESS   !!!!!!                  " + kanava1 );
+
+                    System.out.println("ch1 " + kanava1);
+                } else if (kanava == "CH2") {
+                    this.kanava2 = progress;
+                    System.out.println("ch2" + kanava2);
+                } else {
+                    this.kanava3 = progress;
+                    System.out.println("ch3" + kanava3);
+                }
+            }
+        }
+
+    }
+
+    public void pienennaPienesti(View v)
+    {
+        // tsekataan että taajuus 87.0-108.0 MHz
+        if (seekBar.getProgress() <= 0)
+        {
+            seekBar.setProgress(0);
+            Toast.makeText(getApplicationContext(), "Taajuuden oltava 87.7 ja 108.0 välissä", Toast.LENGTH_SHORT).show();
+        } else {
+            System.out.println("!!!!!!!!!!!!!!         SEEKBAR PROGRESS   !!!!!!                  " + seekBar.getProgress() );
+            int progress = seekBar.getProgress() - 1;
+            seekBar.setProgress(progress);
+            if (kanava1Valittu) {
+                if (kanava == "CH1") {
+                    this.kanava1 = progress;
+                    System.out.println("!!!!!!!!!!!!!!         KANAVA 1 PROGRESS   !!!!!!                  " + kanava1 );
+
+                    System.out.println("ch1 " + kanava1);
+                } else if (kanava == "CH2") {
+                    this.kanava2 = progress;
+                    System.out.println("ch2" + kanava2);
+                } else {
+                    this.kanava3 = progress;
+                    System.out.println("ch3" + kanava3);
+                }
+            }
+        }
+
+    }
+
+    public void kasvataPienesti(View v)
+    {
+        // tsekataan että taajuus 87.0-108.0 MHz
+        if (seekBar.getProgress() >= 1080-780)
+        {
+            seekBar.setProgress(1080-780);
+            Toast.makeText(getApplicationContext(), "Taajuuden oltava 87.7 ja 108.0 välissä", Toast.LENGTH_SHORT).show();
+        } else {
+            System.out.println("!!!!!!!!!!!!!!         SEEKBAR PROGRESS   !!!!!!                  " + seekBar.getProgress() );
+            int progress = seekBar.getProgress() + 1;
+            seekBar.setProgress(progress);
+            if (kanava1Valittu) {
+                if (kanava == "CH1") {
+                    this.kanava1 = progress;
+                    System.out.println("!!!!!!!!!!!!!!         KANAVA 1 PROGRESS   !!!!!!                  " + kanava1 );
+
+                    System.out.println("ch1 " + kanava1);
+                } else if (kanava == "CH2") {
+                    this.kanava2 = progress;
+                    System.out.println("ch2" + kanava2);
+                } else {
+                    this.kanava3 = progress;
+                    System.out.println("ch3" + kanava3);
+                }
             }
         }
 
